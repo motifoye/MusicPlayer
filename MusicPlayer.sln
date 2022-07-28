@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VKApplication", "VKApplication\VKApplication.csproj", "{2CBC299B-BCCE-4848-909F-7417404E6970}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicPlayer", "MusicPlayer\MusicPlayer.csproj", "{2CBC299B-BCCE-4848-909F-7417404E6970}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
