@@ -207,6 +207,7 @@
     </Compile>
     <Compile Include="Model\AudioService.cs" />
     <Compile Include="Model\BaseVM.cs" />
+    <Compile Include="Model\MultiValueEqualityConverter.cs" />
     <Compile Include="Model\OverlayService.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="ViewModel\EditItemViewModel.cs" />

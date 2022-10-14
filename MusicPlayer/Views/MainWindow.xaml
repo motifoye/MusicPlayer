@@ -348,7 +348,7 @@
                         VerticalAlignment="Center"
                         DataContext="{Binding SelectedItem}"
                         Style="{StaticResource BaseText}"
-                        Text="{Binding Source={StaticResource AudioService}, Path=CurrentItem.Name }"
+                        Text="{Binding Source={StaticResource AudioService}, Path=CurrentItem.Name}"
                         TextWrapping="Wrap"
                         />
                     <Grid >

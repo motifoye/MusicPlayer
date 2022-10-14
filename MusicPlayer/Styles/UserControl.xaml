@@ -1,7 +1,11 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:VKApplication.Styles">
+    xmlns:model="clr-namespace:VKApplication.Model">
+    <ObjectDataProvider
+            x:Key="AudioService"
+            MethodName="GetInstance"
+            ObjectType="{x:Type model:AudioService}" />
 
     <ControlTemplate x:Key="ItemListItems" TargetType="ListBoxItem">
         <Grid>
@@ -47,9 +51,21 @@
         <ControlTemplate.Triggers>
             <Trigger Property="IsSelected" Value="true">
                 <Setter TargetName="brd" Property="Background" Value="{StaticResource LightBaseBrush}" />
-                <Setter TargetName="triangle" Property="Visibility" Value="Visible" />
                 <Setter TargetName="txt" Property="Foreground" Value="White" />
             </Trigger>
+            
+            <DataTrigger Value="True">
+                <DataTrigger.Binding>
+                    <MultiBinding >
+                        <MultiBinding.Converter>
+                            <model:MultiValueEqualityConverter/>
+                        </MultiBinding.Converter>
+                        <Binding Source="{StaticResource AudioService}" Path="CurrentItem.Name" />
+                        <Binding ElementName="txt" Path="Text" />
+                    </MultiBinding>
+                </DataTrigger.Binding>
+                <Setter TargetName="triangle" Property="Visibility" Value="Visible" />
+            </DataTrigger>
 
             <Trigger Property="IsMouseOver" Value="true">
                 <Setter TargetName="brd" Property="Background" Value="{StaticResource UltraLightBaseBrush}" />

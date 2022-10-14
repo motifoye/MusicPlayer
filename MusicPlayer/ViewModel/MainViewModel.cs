@@ -21,6 +21,33 @@ namespace VKApplication.ViewModel
 {
     public class MainViewModel : BaseVM
     {
+        public MainViewModel()
+        {
+            OverlayService.GetInstance().Show = (str, vis) =>
+            {
+                OverlayService.GetInstance().Text = str;
+                OverlayService.GetInstance().ProgressBarVisible = vis;
+            };
+
+            AudioService.GetMediaPlayer().MediaEnded += new EventHandler((s, e) =>
+            {
+                NextFilePlay(PlayCommandMethod.Ended);
+            });
+
+
+            Items = File.Exists("ItemsData.json")
+                  ? JsonConvert.DeserializeObject<ObservableCollection<Item>>
+                  (File.ReadAllText("ItemsData.json")) : new ObservableCollection<Item>();
+
+            Items.CollectionChanged += (s, e) => 
+                File.WriteAllText("ItemsData.json", JsonConvert.SerializeObject(Items));
+
+            BindingOperations.EnableCollectionSynchronization(Items, new object());
+            ItemsView = CollectionViewSource.GetDefaultView(Items);
+
+            SelectedItem = Items.FirstOrDefault();
+        }
+
         public string Title { get; set; } = Application.ResourceAssembly.FullName.Split(',')[0];
         public ObservableCollection<Item> Items { get; set; }
         public ICollectionView ItemsView { get; set; }
@@ -57,34 +84,7 @@ namespace VKApplication.ViewModel
             }
         }
         
-        public MainViewModel()
-        {
-            OverlayService.GetInstance().Show = (str, vis) =>
-            {
-                OverlayService.GetInstance().Text = str;
-                OverlayService.GetInstance().ProgressBarVisible = vis;
-            };
-
-            AudioService.GetMediaPlayer().MediaEnded += new EventHandler((s, e) =>
-            {
-                NextFilePlay(PlayCommandMethod.Ended);
-            });
-
-            
-
-            Items = File.Exists("ItemsData.json")
-                  ? JsonConvert.DeserializeObject<ObservableCollection<Item>>
-                  (File.ReadAllText("ItemsData.json")) : new ObservableCollection<Item>();
-
-            Items.CollectionChanged += (s, e) => 
-                File.WriteAllText("ItemsData.json", JsonConvert.SerializeObject(Items));
-
-            BindingOperations.EnableCollectionSynchronization(Items, new object());
-            ItemsView = CollectionViewSource.GetDefaultView(Items);
-
-            SelectedItem = Items.FirstOrDefault();
-        }
-
+       
         public ICommand Sort
         {
             get
@@ -377,6 +377,8 @@ namespace VKApplication.ViewModel
                 });
             }
         }
+
+
         /// <summary>
         /// Метод для переключения треков.
         /// </summary>
