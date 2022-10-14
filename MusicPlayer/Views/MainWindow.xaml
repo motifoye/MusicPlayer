@@ -12,6 +12,8 @@
     Title="{Binding Title}" 
     MinWidth="800"
     MinHeight="560"
+    Width="800"
+    Height="560"
     ResizeMode="CanResize"
     WindowStartupLocation="CenterScreen"
     WindowState="Normal"
@@ -313,10 +315,26 @@
                             Content="+5"
                             Style="{StaticResource BaseButton}"/>
                         <Button
+                            Command="{Binding ChangeRepeat}"
                             Width="30"
                             Height="30"
-                            Content=""
-                            Style="{StaticResource BaseButton}"/>
+                            Style="{StaticResource BaseButton}"
+                            >
+                            <ContentControl>
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Setter Property="Width" Value="20"/>
+                                        <Setter Property="Height" Value="20"/>
+                                        <Setter Property="Content" Value="{StaticResource Repeat}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.IsRepeat}" Value="true">
+                                                <Setter Property="Content" Value="{StaticResource Repeat-1}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
+                        </Button>
 
                     </StackPanel>
                     

@@ -26,6 +26,7 @@ namespace VKApplication.ViewModel
         public ICollectionView ItemsView { get; set; }
         public Page MainContent { get; set; }
         public Item SelectedItem { get; set; }
+        public bool IsRepeat { get; set; } = false;
 
         private string _SearchText { get; set; }
         public string SearchText
@@ -66,7 +67,7 @@ namespace VKApplication.ViewModel
 
             AudioService.GetMediaPlayer().MediaEnded += new EventHandler((s, e) =>
             {
-                NextFilePlay();
+                NextFilePlay(PlayCommandMethod.Ended);
             });
 
             
@@ -288,7 +289,6 @@ namespace VKApplication.ViewModel
                 });
             }
         }
-
         public ICommand StartPlay
         {
             get
@@ -325,7 +325,7 @@ namespace VKApplication.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    NextFilePlay();
+                    NextFilePlay(PlayCommandMethod.Next);
                 }, ()=> AudioService.GetInstance().CurrentItem != null);
             }
         }
@@ -335,12 +335,7 @@ namespace VKApplication.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    ItemsView.MoveCurrentTo(AudioService.GetInstance().CurrentItem);
-                    if (!ItemsView.MoveCurrentToPrevious())
-                    {
-                        ItemsView.MoveCurrentToLast();
-                    }
-                    AudioService.GetInstance().StartPlay(ItemsView.CurrentItem as Item);
+                    NextFilePlay(PlayCommandMethod.Prev);
                 }, () => AudioService.GetInstance().CurrentItem != null);
             }
         }
@@ -356,7 +351,7 @@ namespace VKApplication.ViewModel
                     }
                     catch (Exception)
                     {
-                        NextFilePlay();
+                        NextFilePlay(PlayCommandMethod.Ended);
                     }
 
                 }, () => AudioService.GetInstance().CurrentItem != null);
@@ -372,18 +367,62 @@ namespace VKApplication.ViewModel
                 }, () => AudioService.GetInstance().CurrentItem != null);
             }
         }
-
-
-
-
-        private void NextFilePlay()
+        public ICommand ChangeRepeat
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    IsRepeat = !IsRepeat;
+                });
+            }
+        }
+        /// <summary>
+        /// Метод для переключения треков.
+        /// </summary>
+        /// <param name="method">
+        /// Тип метода. Определяет как переключится трек.
+        /// </param>
+        private void NextFilePlay(PlayCommandMethod method)
         {
             ItemsView.MoveCurrentTo(AudioService.GetInstance().CurrentItem);
-            if (!ItemsView.MoveCurrentToNext())
+
+            switch (method)
             {
-                ItemsView.MoveCurrentToFirst();
+                case PlayCommandMethod.Next:
+                    Next();
+                    break;
+                case PlayCommandMethod.Prev:
+                    Prev();
+                    break;
+                case PlayCommandMethod.Ended:
+                    if (!IsRepeat) Next();
+                    break;
+                default:
+                    break;
+            }
+            void Next()
+            {
+                if (!ItemsView.MoveCurrentToNext())
+                {
+                    ItemsView.MoveCurrentToFirst();
+                }
+            }
+            void Prev()
+            {
+                if (!ItemsView.MoveCurrentToPrevious())
+                {
+                    ItemsView.MoveCurrentToLast();
+                }
             }
             AudioService.GetInstance().StartPlay(ItemsView.CurrentItem as Item);
+        }
+
+        private enum PlayCommandMethod
+        {
+            Next,
+            Prev,
+            Ended
         }
 
         private System.Collections.Generic.List<string> GetFiles(string path, string pattern)
