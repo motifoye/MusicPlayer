@@ -27,11 +27,7 @@
                         BorderThickness="{TemplateBinding BorderThickness}">
 
                         <Grid Margin="5">
-
-
-
                             <ScrollViewer x:Name="PART_ContentHost" Margin="0" />
-
                             <TextBlock
                                 x:Name="hint"
                                 VerticalAlignment="Center"

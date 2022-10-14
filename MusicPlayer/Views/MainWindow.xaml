@@ -6,7 +6,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:VKApplication.App"
     xmlns:model="clr-namespace:VKApplication.Model"
-    xmlns:modelvk="clr-namespace:VkNet.Model;assembly=VkNet"
     xmlns:viewmodel="clr-namespace:VKApplication.ViewModel"
     mc:Ignorable="d"
     Name="window"
