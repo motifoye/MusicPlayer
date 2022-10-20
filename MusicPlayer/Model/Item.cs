@@ -9,5 +9,6 @@ namespace VKApplication.Model
         public double Size { get; set; }
         public Uri Path { get; set; }
         public DateTime DateOfChange { get; set; }
+        public string Playlist { get; set; }
     }
 }

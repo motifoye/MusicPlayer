@@ -17,11 +17,6 @@ namespace VKApplication.Model
 {
     public class AudioService : BaseVM
     {
-        private static AudioService _Instance = new AudioService();
-        public static AudioService GetInstance() => _Instance;
-        public static MediaPlayer GetMediaPlayer() => _MediaPlayer;
-        
-
         private AudioService() 
         {
             _MediaPlayer = new MediaPlayer();
@@ -33,23 +28,16 @@ namespace VKApplication.Model
             _MediaPlayer.Volume = 0.01;
         }
 
-        private void _MediaOpened(object sender, EventArgs e)
-        {
-            if (_MediaPlayer.Clock.NaturalDuration.HasTimeSpan)
-                TotalTime = _MediaPlayer.Clock.NaturalDuration.TimeSpan;
-        }
-
-        private void _CurrentTimeInvalidated(object sender, EventArgs e)
-        {
-            CurrentTime = _MediaPlayer.Clock.CurrentTime.Value;
-        }
-
+        private static AudioService _Instance = new AudioService();
         public static MediaPlayer _MediaPlayer { get; set; }
         public static MediaTimeline _MediaTimeline { get; set; }
+        public static AudioService GetInstance() => _Instance;
+        public static MediaPlayer GetMediaPlayer() => _MediaPlayer;
         public Item CurrentItem { get; set; }
         public MediaClock Clock { get; set; }
         public TimeSpan TotalTime { get; set; }
         public TimeSpan CurrentTime { get; set; }
+        public bool IsPaused { get; private set; } = true;
         public long _CurrentTime
         {
             get
@@ -66,27 +54,45 @@ namespace VKApplication.Model
         {
             get
             {
-                return (int)(_MediaPlayer.Volume*100);
+                return (int)(_MediaPlayer.Volume * 100);
             }
             set
             {
                 _MediaPlayer.Volume = (double)value / 100;
             }
         }
-                                                                                                       
+
+        private void _MediaOpened(object sender, EventArgs e)
+        {
+            if (_MediaPlayer.Clock.NaturalDuration.HasTimeSpan)
+                TotalTime = _MediaPlayer.Clock.NaturalDuration.TimeSpan;
+        }
+
+        private void _CurrentTimeInvalidated(object sender, EventArgs e)
+        {
+            CurrentTime = _MediaPlayer.Clock.CurrentTime.Value;
+        }
+                                     
         public void StartPlay(Item item)
         {
             CurrentItem = item;
             _MediaTimeline.Source = item.Path;
             Clock = _MediaTimeline.CreateClock();
             _MediaPlayer.Clock = Clock;
+            IsPaused = false;
         }                                                  
         public void PlayPause()
         {
             if (_MediaPlayer.Clock.IsPaused == true)
+            {
                 _MediaPlayer.Clock.Controller.Resume();
+                IsPaused = false;
+            }
             else if (_MediaPlayer.Clock.IsPaused == false)
+            {
                 _MediaPlayer.Clock.Controller.Pause();
+                IsPaused = true;
+            }
         }
 
         public void Pause() => _MediaPlayer.Clock.Controller.Pause();
@@ -94,7 +100,10 @@ namespace VKApplication.Model
         public void Stop()
         {
             if (_MediaPlayer.Clock.IsPaused == false)
+            {
                 _MediaPlayer.Clock.Controller.Pause();
+                IsPaused = true;
+            }
             _MediaPlayer.Clock.Controller.Seek(TimeSpan.Zero, TimeSeekOrigin.BeginTime);
         }
 

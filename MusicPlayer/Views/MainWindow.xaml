@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:fa="http://schemas.fontawesome.com/icons/svg"
+    xmlns:fap="http://schemas.fontawesome.com/icons/svg/properties"
     xmlns:local="clr-namespace:VKApplication.App"
     xmlns:model="clr-namespace:VKApplication.Model"
     xmlns:viewmodel="clr-namespace:VKApplication.ViewModel"
@@ -28,6 +30,10 @@
             x:Key="AudioService"
             MethodName="GetInstance"
             ObjectType="{x:Type model:AudioService}" />
+        <ObjectDataProvider
+            x:Key="MediaPlayer"
+            MethodName="GetMediaPlayer"
+            ObjectType="{x:Type model:AudioService}" />
     </Window.Resources>
 
     <Window.DataContext>
@@ -43,75 +49,105 @@
         <!--Левая часть-->
         <Grid Background="{StaticResource MediumBrush}">
             <Grid.RowDefinitions>
+                <!--Кнопки-->
+                <RowDefinition Height="45" />
+                <!--Сорт, поиск-->
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="*" />
+                <!--Инфо-->
+                <RowDefinition MinHeight="150"/>
             </Grid.RowDefinitions>
 
             <!--Кнопки-->
-            <Grid Background="{StaticResource MediumBaseBrush}">
-                <StackPanel
-                    HorizontalAlignment="Center"
-                    Orientation="Horizontal">
-
+            <Border Background="{StaticResource MediumBaseBrush}">
+                <Grid Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    
                     <Button
+                        Grid.Column="0"
                         Command="{Binding FindItem}"
+                        ToolTip="Сканировань папку"
                         Style="{StaticResource BaseButton}">
-                        <ContentControl Height="50" Content="{StaticResource SearchIcon}"/>
+                        <fa:SvgAwesome Icon="Solid_MagnifyingGlass" PrimaryColor="white" Margin="3"/>
                     </Button>
 
                     <Button 
+                        Grid.Column="1"
                         Command="{Binding AddItem}" 
+                        ToolTip="Добавить музыку"
                         Style="{StaticResource BaseButton}">
-                        <ContentControl Height="50" Content="{StaticResource PlusIcon}" />
+                        <fa:SvgAwesome Icon="Solid_Plus" PrimaryColor="white" Margin="3"/>
                     </Button>
 
                     <Button
+                        Grid.Column="2"
                         Command="{Binding EditItem}"
                         CommandParameter="{Binding SelectedItem}"
+                        ToolTip="Изменить"
                         Style="{StaticResource BaseButton}">
-                        <ContentControl Height="50" Content="{StaticResource PanIcon}" />
+                        <fa:SvgAwesome Icon="Regular_PenToSquare" PrimaryColor="white" Margin="3"/>
                     </Button>
 
                     <Button
+                        Grid.Column="3"
                         Command="{Binding DeleteItem}"
                         CommandParameter="{Binding SelectedItem}"
+                        ToolTip="Удалить из списка"
                         Style="{StaticResource BaseButton}">
-                        <ContentControl Height="50" Content="{StaticResource TrashIcon}" />
+                        <fa:SvgAwesome Icon="Regular_TrashCan" PrimaryColor="white" Margin="3"/>
                     </Button>
-                </StackPanel>
-            </Grid>
+                </Grid>
+            </Border>
 
             <!--Поиск,Сортировка-->
-            <StackPanel Grid.Row="1">
-
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+                
                 <TextBox
-                    Margin="10,10,10,0"
+                    Grid.Row="0"
+                    Margin="10"
+                    Tag="Найти в названии"
                     Style="{StaticResource BaseTextBox}"
-                    Tag="Найти в названии...."
-                    Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                    Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <Grid>
+                <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="50"/>
                     </Grid.ColumnDefinitions>
                     <Button
-                        Margin="10 10 5 10"
+                        Margin="10"
                         Content="Сортировка"
+                        ToolTip="Сортировать список"
                         Command="{Binding Sort}"
                         Style="{StaticResource BaseButton}" />
                     <Button
                         Grid.Column="1"
-                        Margin="5 10 10 10"
-                        Height="30"
-                        Width="30"
-                        Content="X"
+                        Margin="10"
+                        ToolTip="Отменить сортировку"
                         Command="{Binding Sort}"
                         CommandParameter="1"
+                        Style="{StaticResource BaseButton}">
+                        <fa:SvgAwesome Icon="Solid_Xmark"  PrimaryColor="white"/>
+                    </Button>
+                </Grid>
+
+                <Grid Grid.Row="2" >
+                    <Button
+                        Margin="10"
+                        Content="Избранное"
+                        Command="{Binding SearchOfPlaylist}"
                         Style="{StaticResource BaseButton}" />
                 </Grid>
-            </StackPanel>
+            </Grid>
 
             <!--Описание-->
             <Grid
@@ -228,118 +264,150 @@
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
 
                 <!-- Кнопки -->
-                <StackPanel
-                    Grid.Column="0"
-                    Margin="10,0"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-                    
-                    <StackPanel Orientation="Horizontal">
+                <Grid Margin="10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="30"/>
+                    </Grid.ColumnDefinitions>
 
-                        <Button
-                            Command="{Binding StartPlay}"
-                            CommandParameter="{Binding SelectedItem}"
-                            Width="30"
-                            Height="30"
-                            Style="{StaticResource BaseButton}">
-                                <ContentControl  
-                                Width="24"
-                                Height="24"
-                                Margin="-6,-6,0,0"
-                                Content="{StaticResource PlayIcon}"/>
-                        </Button>
-                        <Button
-                            Command="{Binding PrevPlay}"
-                            Width="30"
-                            Height="30"
-                            Style="{StaticResource BaseButton}">
-                                <ContentControl  
-                                Width="24"
-                                Height="24"
-                                Margin="-6,-6,0,0"
-                                Content="{StaticResource PlayPrevIcon}"/>
-                        </Button>
-                        <Button
-                            Command="{Binding PlayPause}"
-                            Width="30"
-                            Height="30"
-                            Style="{StaticResource BaseButton}">
-                                <ContentControl  
-                                Width="24"
-                                Height="24"
-                                Margin="-6,-6,0,0"
-                                Content="{StaticResource PauseIcon}"/>
-                        </Button>
-                        <Button
-                            Command="{Binding NextPlay}"
-                            Width="30"
-                            Height="30"
-                            Style="{StaticResource BaseButton}">
-                                <ContentControl  
-                                Width="24"
-                                Height="24"
-                                Margin="-6,-6,0,0"
-                                Content="{StaticResource PlayNextIcon}"/>
-                        </Button>
-
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal">
-
-                        <Button
-                            Command="{Binding StopPlay}"
-                            CommandParameter="{Binding SelectedItem}"
-                            Width="30"
-                            Height="30"
-                            Style="{StaticResource BaseButton}">
-                            <ContentControl  
-                                Width="24"
-                                Height="24"
-                                Margin="3"
-                                Content="{StaticResource StopIcon}"/>
-                        </Button>
-                        <Button
-                            Command="{Binding MoveBack}"
-                            Width="30"
-                            Height="30"
-                            Content="-5"
-                            Style="{StaticResource BaseButton}"/>
-                        <Button
-                            Command="{Binding MoveForward}"
-                            Width="30"
-                            Height="30"
-                            Content="+5"
-                            Style="{StaticResource BaseButton}"/>
-                        <Button
-                            Command="{Binding ChangeRepeat}"
-                            Width="30"
-                            Height="30"
+                    <Button Command="{Binding PrevPlay}" 
+                            Grid.Row="0" Grid.Column="0" 
                             Style="{StaticResource BaseButton}"
-                            >
-                            <ContentControl>
-                                <ContentControl.Style>
-                                    <Style TargetType="ContentControl">
-                                        <Setter Property="Width" Value="20"/>
-                                        <Setter Property="Height" Value="20"/>
-                                        <Setter Property="Content" Value="{StaticResource Repeat}"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.IsRepeat}" Value="true">
-                                                <Setter Property="Content" Value="{StaticResource Repeat-1}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContentControl.Style>
-                            </ContentControl>
-                        </Button>
+                            ToolTip="Назад">
+                        <fa:SvgAwesome Icon="Solid_BackwardStep" PrimaryColor="White"/>
+                    </Button>
 
-                    </StackPanel>
-                    
-                </StackPanel>
+                    <Button Command="{Binding PlayPause}"
+                            Style="{StaticResource BaseButton}"
+                            Grid.Row="0" Grid.Column="1"
+                            ToolTip="Пауза / Продолжить">
+                        <ContentControl>
+                            <ContentControl.Style>
+                                <Style TargetType="ContentControl">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <fa:SvgAwesome Icon="Solid_Play" PrimaryColor="White"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Source={StaticResource AudioService}, Path=IsPaused}" 
+                                                     Value="false">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <fa:SvgAwesome Icon="Solid_Pause" PrimaryColor="White"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentControl.Style>
+                        </ContentControl>
+                    </Button>
 
+                    <Button Command="{Binding NextPlay}"
+                            Style="{StaticResource BaseButton}"
+                            Grid.Row="0" Grid.Column="2"
+                            ToolTip="Вперед">
+                        <fa:SvgAwesome Icon="Solid_ForwardStep" PrimaryColor="White"/>
+                    </Button>
+
+                    <Button Command="{Binding ChangeRepeat}"
+                            Style="{StaticResource BaseButton}"
+                            Grid.Row="0" Grid.Column="3" 
+                            ToolTip="Повторять один трек">
+                        <ContentControl>
+                            <ContentControl.Style>
+                                <Style TargetType="ContentControl">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <fa:SvgAwesome Icon="Solid_Repeat" PrimaryColor="White"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, 
+                                                                        AncestorType=Window}, Path=DataContext.IsRepeat}" 
+                                                     Value="true">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Grid>
+                                                        <fa:SvgAwesome Icon="Solid_Repeat" PrimaryColor="White"/>
+                                                        <TextBlock Text="i" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11"/>
+                                                    </Grid>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentControl.Style>
+                        </ContentControl>
+                    </Button>
+
+                    <Button Command="{Binding MoveBack}"
+                            Style="{StaticResource BaseButton}"
+                            Grid.Row="1" Grid.Column="0"
+                            ToolTip="Назад на 5 секунд">
+                        <Grid>
+                            <fa:SvgAwesome Icon="Solid_RotateLeft" PrimaryColor="White"/>
+                            <TextBlock Text="5" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Command="{Binding StopPlay}"
+                            Style="{StaticResource BaseButton}"
+                            Grid.Row="1" Grid.Column="1"
+                            ToolTip="Остановить воспроизведение">
+                        <fa:SvgAwesome Icon="Solid_Stop" PrimaryColor="White"/>
+                    </Button>
+
+                    <Button Command="{Binding MoveForward}"
+                            Style="{StaticResource BaseButton}"
+                            Grid.Row="1" Grid.Column="2"
+                            ToolTip="Вперед на 5 секунд">
+                        <Grid>
+                            <fa:SvgAwesome Icon="Solid_RotateRight" PrimaryColor="White"/>
+                            <TextBlock Text="5" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11"/>
+                        </Grid>
+                    </Button>
+
+
+                    <Button Command="{Binding ChangeBookmark}" 
+                            Style="{StaticResource BaseButton}"
+                            Grid.Row="1" Grid.Column="3"
+                            ToolTip="Добавить в избранное текуций трек">
+                        <ContentControl>
+                            <ContentControl.Style>
+                                <Style TargetType="ContentControl">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <fa:SvgAwesome Icon="Regular_Bookmark" PrimaryColor="White"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Source={StaticResource AudioService}, Path=CurrentItem.Playlist}" 
+                                                     Value="1">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <fa:SvgAwesome Icon="Solid_Bookmark" PrimaryColor="White"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentControl.Style>
+                        </ContentControl>
+                    </Button>
+                </Grid>
+                
                 <!-- Инфа о треке -->
                 <StackPanel
                     Grid.Column="1">
@@ -408,12 +476,15 @@
                 BorderThickness="0"
                 ItemsSource="{Binding ItemsView}"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                SelectedItem="{Binding SelectedItem}">
+                SelectedItem="{Binding SelectedItem}"
+                MouseDoubleClick="listItems_MouseDoubleClick"
+                >
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="Template" Value="{StaticResource ItemListItems}" />
                     </Style>
                 </ListBox.ItemContainerStyle>
+                
             </ListBox>
 
             <!--кол-во-->

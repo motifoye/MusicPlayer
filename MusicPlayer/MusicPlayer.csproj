@@ -54,6 +54,15 @@
     <Reference Include="DotNetProjects.WPF.Themes, Version=6.1.94.0, Culture=neutral, PublicKeyToken=79778c5f2eed289b, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetProjects.WpfToolkit.Themes.6.1.94\lib\net40\DotNetProjects.WPF.Themes.dll</HintPath>
     </Reference>
+    <Reference Include="FontAwesome6.Core, Version=2.4.2.0, Culture=neutral, PublicKeyToken=150287d219411f04, processorArchitecture=MSIL">
+      <HintPath>..\packages\FontAwesome6.Svg.2.4.2\lib\net472\FontAwesome6.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FontAwesome6.Shared.Net, Version=2.4.2.0, Culture=neutral, PublicKeyToken=150287d219411f04, processorArchitecture=MSIL">
+      <HintPath>..\packages\FontAwesome6.Svg.2.4.2\lib\net472\FontAwesome6.Shared.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="FontAwesome6.Svg.Net, Version=2.4.2.0, Culture=neutral, PublicKeyToken=150287d219411f04, processorArchitecture=MSIL">
+      <HintPath>..\packages\FontAwesome6.Svg.2.4.2\lib\net472\FontAwesome6.Svg.Net.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.11.42.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.11.42\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -174,10 +183,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles\Fonts.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\Icons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

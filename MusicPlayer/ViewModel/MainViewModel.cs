@@ -16,6 +16,8 @@ using System.Windows.Input;
 using VKApplication.Model;
 using VKApplication.App.Views;
 using VKApplication.App.ViewModel;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
+using System.Collections.Specialized;
 
 namespace VKApplication.ViewModel
 {
@@ -53,8 +55,8 @@ namespace VKApplication.ViewModel
         public ICollectionView ItemsView { get; set; }
         public Page MainContent { get; set; }
         public Item SelectedItem { get; set; }
+        public bool SelectedPlaylist { get; set; } = false;
         public bool IsRepeat { get; set; } = false;
-
         private string _SearchText { get; set; }
         public string SearchText
         {
@@ -106,6 +108,35 @@ namespace VKApplication.ViewModel
                         ItemsView.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
                     }
                 });
+            }
+        }
+        public ICommand SearchOfPlaylist
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    if (SelectedPlaylist == false)
+                    {
+                        SearchText = "";
+                        ItemsView.Filter = (obj) =>
+                        {
+                            if (obj is Item item)
+                            {
+                                return (item.Playlist != null);
+                            }
+                            return false;
+                        };
+                        SelectedPlaylist = true;
+                    }
+                    else
+                    {
+                        ItemsView.Filter = null;
+                        SelectedPlaylist = false;
+                    }
+                        ItemsView.Refresh();
+                    
+                }) ;
             }
         }
         public ICommand DeleteItem
@@ -293,10 +324,21 @@ namespace VKApplication.ViewModel
         {
             get
             {
-                return new DelegateCommand<Item>((item) =>
+                return new DelegateCommand(() =>
                 {
-                    AudioService.GetInstance().StartPlay(item);
-                }, (item) => item != null);
+                    AudioService.GetInstance().StartPlay(SelectedItem);
+                }, () => SelectedItem != null);
+            }
+        }
+        public ICommand ReStartPlay
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    AudioService.GetInstance().Stop();
+                    AudioService.GetInstance().Resume();
+                }, () => AudioService.GetInstance().CurrentItem != null);
             }
         }
         public ICommand PlayPause
@@ -305,8 +347,11 @@ namespace VKApplication.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    AudioService.GetInstance().PlayPause();
-                }, ()=>AudioService.GetInstance().CurrentItem != null);
+                    if (AudioService.GetInstance().CurrentItem != null)
+                        AudioService.GetInstance().PlayPause();
+                    else
+                        AudioService.GetInstance().StartPlay(SelectedItem);
+                });
             }
         }
         public ICommand StopPlay
@@ -326,7 +371,7 @@ namespace VKApplication.ViewModel
                 return new DelegateCommand(() =>
                 {
                     NextFilePlay(PlayCommandMethod.Next);
-                }, ()=> AudioService.GetInstance().CurrentItem != null);
+                });
             }
         }
         public ICommand PrevPlay
@@ -336,7 +381,7 @@ namespace VKApplication.ViewModel
                 return new DelegateCommand(() =>
                 {
                     NextFilePlay(PlayCommandMethod.Prev);
-                }, () => AudioService.GetInstance().CurrentItem != null);
+                });
             }
         }
         public ICommand MoveForward
@@ -375,6 +420,26 @@ namespace VKApplication.ViewModel
                 {
                     IsRepeat = !IsRepeat;
                 });
+            }
+        }
+        public ICommand ChangeBookmark
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    var a = AudioService.GetInstance().CurrentItem;
+                    var i = Items.IndexOf(a);
+                    if (a.Playlist == null)
+                        a.Playlist = "1";
+                    else 
+                        a.Playlist = null;
+                    Items.RemoveAt(i);
+                    Items.Insert(i, a);
+                    
+                    
+
+                }, ()=>AudioService.GetInstance().CurrentItem != null);
             }
         }
 
