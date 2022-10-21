@@ -144,8 +144,17 @@
                     <Button
                         Margin="10"
                         Content="Избранное"
-                        Command="{Binding SearchOfPlaylist}"
-                        Style="{StaticResource BaseButton}" />
+                        Command="{Binding SearchOfPlaylist}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource BaseButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedPlaylist}" Value="true">
+                                        <Setter Property="Background" Value="{StaticResource DarkBaseBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </Grid>
             </Grid>
 
