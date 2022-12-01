@@ -29,8 +29,8 @@ namespace VKApplication.Model
         }
 
         private static AudioService _Instance = new AudioService();
-        public static MediaPlayer _MediaPlayer { get; set; }
-        public static MediaTimeline _MediaTimeline { get; set; }
+        private static MediaPlayer _MediaPlayer { get; set; }
+        private static MediaTimeline _MediaTimeline { get; set; }
         public static AudioService GetInstance() => _Instance;
         public static MediaPlayer GetMediaPlayer() => _MediaPlayer;
         public Item CurrentItem { get; set; }
