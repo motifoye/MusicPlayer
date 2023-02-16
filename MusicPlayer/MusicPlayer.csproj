@@ -194,10 +194,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AuthorizeVKWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\EditItemWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -217,9 +213,6 @@
     <Compile Include="Model\Item.cs" />
     <Compile Include="ViewModel\EditItemViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="Views\AuthorizeVKWindow.xaml.cs">
-      <DependentUpon>AuthorizeVKWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\EditItemWindow.xaml.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

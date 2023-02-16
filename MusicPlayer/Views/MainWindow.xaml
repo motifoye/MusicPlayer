@@ -513,7 +513,7 @@
                         <Setter Property="Template" Value="{StaticResource ItemListItems}" />
                     </Style>
                 </ListBox.ItemContainerStyle>
-                
+
             </ListBox>
 
             <!--кол-во-->

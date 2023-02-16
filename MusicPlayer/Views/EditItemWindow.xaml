@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     Title="EditItemWindow" 
     Width="500"
-    Height="700"
+    Height="275"
     WindowStartupLocation="CenterScreen"
     ><!--xmlns:model="clr-namespace:VKApplication.App.Model"-->
 
@@ -18,7 +18,7 @@
     </Window.DataContext>
 
     <Grid Background="{StaticResource LightBrush}">
-        <ScrollViewer>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" >
             <StackPanel Name="root" Margin="010">
                 
 
@@ -75,7 +75,7 @@
                                 <TextBox
                                     Margin="10"
                                     VerticalAlignment="Center"
-                                    IsReadOnly="True"
+                                    IsReadOnly="False"
                                     Foreground="{StaticResource MediumBaseBrush}"
                                     Style="{StaticResource BaseTextBox}"
                                     Text="{Binding ItemInfo.Path}"

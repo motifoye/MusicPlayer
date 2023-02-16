@@ -243,8 +243,6 @@ namespace VKApplication.ViewModel
                                                 isExist = true;
                                         }
 
-                                        //MessageBox.Show($"{isExist}");
-
                                         if (!isExist)
                                         {
                                             Items.Add(newItem);
