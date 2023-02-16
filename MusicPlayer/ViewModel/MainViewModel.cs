@@ -16,8 +16,6 @@ using System.Windows.Input;
 using VKApplication.Model;
 using VKApplication.App.Views;
 using VKApplication.App.ViewModel;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using System.Collections.Specialized;
 
 namespace VKApplication.ViewModel
 {
@@ -33,7 +31,7 @@ namespace VKApplication.ViewModel
 
             AudioService.GetMediaPlayer().MediaEnded += new EventHandler((s, e) =>
             {
-                NextFilePlay(PlayCommandMethod.Ended);
+                PlayerSwitch(PlayerCommandMethod.Ended);
             });
 
 
@@ -318,38 +316,14 @@ namespace VKApplication.ViewModel
                 });
             }
         }
-        public ICommand StartPlay
-        {
-            get
-            {
-                return new DelegateCommand(() =>
-                {
-                    AudioService.GetInstance().StartPlay(SelectedItem);
-                }, () => SelectedItem != null);
-            }
-        }
-        public ICommand ReStartPlay
-        {
-            get
-            {
-                return new DelegateCommand(() =>
-                {
-                    AudioService.GetInstance().Stop();
-                    AudioService.GetInstance().Resume();
-                }, () => AudioService.GetInstance().CurrentItem != null);
-            }
-        }
         public ICommand PlayPause
         {
             get
             {
                 return new DelegateCommand(() =>
                 {
-                    if (AudioService.GetInstance().CurrentItem != null)
-                        AudioService.GetInstance().PlayPause();
-                    else
-                        AudioService.GetInstance().StartPlay(SelectedItem);
-                });
+                    PlayerSwitch(PlayerCommandMethod.PlayPause);
+                }, () => !(SelectedItem is null) || !(AudioService.GetInstance().CurrentItem is null));
             }
         }
         public ICommand StopPlay
@@ -358,7 +332,7 @@ namespace VKApplication.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    AudioService.GetInstance().Stop();
+                    PlayerSwitch(PlayerCommandMethod.Stop);
                 }, () => AudioService.GetInstance().CurrentItem != null);
             }
         }
@@ -368,8 +342,8 @@ namespace VKApplication.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    NextFilePlay(PlayCommandMethod.Next);
-                });
+                    PlayerSwitch(PlayerCommandMethod.Next);
+                }, () => !ItemsView.IsEmpty);
             }
         }
         public ICommand PrevPlay
@@ -378,8 +352,8 @@ namespace VKApplication.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    NextFilePlay(PlayCommandMethod.Prev);
-                });
+                    PlayerSwitch(PlayerCommandMethod.Prev);
+                }, () => !ItemsView.IsEmpty);
             }
         }
         public ICommand MoveForward
@@ -388,15 +362,7 @@ namespace VKApplication.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    try
-                    {
-                        AudioService.GetInstance().MoveForward();
-                    }
-                    catch (Exception)
-                    {
-                        NextFilePlay(PlayCommandMethod.Ended);
-                    }
-
+                    PlayerSwitch(PlayerCommandMethod.MoveForward);
                 }, () => AudioService.GetInstance().CurrentItem != null);
             }
         }
@@ -406,7 +372,7 @@ namespace VKApplication.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    AudioService.GetInstance().MoveBack();
+                    PlayerSwitch(PlayerCommandMethod.MoveBack);
                 }, () => AudioService.GetInstance().CurrentItem != null);
             }
         }
@@ -434,9 +400,6 @@ namespace VKApplication.ViewModel
                         a.Playlist = null;
                     Items.RemoveAt(i);
                     Items.Insert(i, a);
-                    
-                    
-
                 }, ()=>AudioService.GetInstance().CurrentItem != null);
             }
         }
@@ -448,46 +411,105 @@ namespace VKApplication.ViewModel
         /// <param name="method">
         /// Тип метода. Определяет как переключится трек.
         /// </param>
-        private void NextFilePlay(PlayCommandMethod method)
+        private void PlayerSwitch(PlayerCommandMethod method)
         {
-            ItemsView.MoveCurrentTo(AudioService.GetInstance().CurrentItem);
+            var service = AudioService.GetInstance();
 
             switch (method)
             {
-                case PlayCommandMethod.Next:
+                case PlayerCommandMethod.PlayPause:
+                    PlayPause();
+                    break;
+                case PlayerCommandMethod.Stop:
+                    Stop();
+                    break;
+                case PlayerCommandMethod.Next:
                     Next();
                     break;
-                case PlayCommandMethod.Prev:
+                case PlayerCommandMethod.Prev:
                     Prev();
                     break;
-                case PlayCommandMethod.Ended:
-                    if (!IsRepeat) Next();
+                case PlayerCommandMethod.Ended:
+                    Ended();
+                    break;
+                case PlayerCommandMethod.MoveForward:
+                    MoveForward();
+                    break;
+                case PlayerCommandMethod.MoveBack:
+                    MoveBack();
                     break;
                 default:
-                    break;
+                    return;
             }
+
             void Next()
             {
+                if (ItemsView.IsEmpty) return;
+                ItemsView.MoveCurrentTo(service.CurrentItem);
                 if (!ItemsView.MoveCurrentToNext())
-                {
                     ItemsView.MoveCurrentToFirst();
-                }
+                service.StartPlay(ItemsView.CurrentItem as Item);
             }
+
             void Prev()
             {
+                if (ItemsView.IsEmpty) return;
+                ItemsView.MoveCurrentTo(service.CurrentItem);
                 if (!ItemsView.MoveCurrentToPrevious())
-                {
                     ItemsView.MoveCurrentToLast();
+                service.StartPlay(ItemsView.CurrentItem as Item);
+            }
+
+            void PlayPause()
+            {
+                if (service.CurrentItem != null)
+                    service.PlayPause();
+                else if (SelectedItem != null)
+                    service.StartPlay(SelectedItem);
+            }
+
+            void Stop()
+            {
+                service.Stop();
+            }
+            
+            void Ended()
+            {
+                if (IsRepeat)
+                    service.Restart();
+                else if (ItemsView.IsEmpty)
+                    Stop();
+                else
+                    Next();
+            }
+
+            void MoveForward()
+            {
+                try
+                {
+                    service.MoveForward();
+                }
+                catch (Exception)
+                {
+                    Ended();
                 }
             }
-            AudioService.GetInstance().StartPlay(ItemsView.CurrentItem as Item);
+
+            void MoveBack()
+            {
+                service.MoveBack();
+            }
         }
 
-        private enum PlayCommandMethod
+        private enum PlayerCommandMethod
         {
+            PlayPause,
+            Stop,
             Next,
             Prev,
-            Ended
+            Ended,
+            MoveForward,
+            MoveBack
         }
 
         private System.Collections.Generic.List<string> GetFiles(string path, string pattern)
