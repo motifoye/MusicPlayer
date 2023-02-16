@@ -1,23 +1,12 @@
 ﻿using System;
-using System.Media;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
-using VKApplication.Model;
-using System.Collections.ObjectModel;
-using VKApplication.ViewModel;
-using System.ComponentModel;
-using System.Windows;
 using System.Windows.Media.Animation;
-using System.Windows.Controls;
 
 namespace VKApplication.Model
 {
     public class AudioService : BaseVM
     {
-        private AudioService() 
+        private AudioService()
         {
             _MediaPlayer = new MediaPlayer();
             _MediaTimeline = new MediaTimeline();
@@ -72,15 +61,17 @@ namespace VKApplication.Model
         {
             CurrentTime = _MediaPlayer.Clock.CurrentTime.Value;
         }
-                                     
+
         public void StartPlay(Item item)
         {
+            if (item is null)
+                throw new ArgumentNullException(nameof(item), "Объект для старта не был передан");
             CurrentItem = item;
             _MediaTimeline.Source = item.Path;
             Clock = _MediaTimeline.CreateClock();
             _MediaPlayer.Clock = Clock;
             IsPaused = false;
-        }                                                  
+        }
         public void PlayPause()
         {
             if (_MediaPlayer.Clock.IsPaused == true)
@@ -97,8 +88,14 @@ namespace VKApplication.Model
 
         public void Pause() => _MediaPlayer.Clock.Controller.Pause();
         public void Resume() => _MediaPlayer.Clock.Controller.Resume();
+        public void Restart()
+        {
+            Stop();
+            Resume();
+        }
         public void Stop()
         {
+            if (_MediaPlayer.Clock is null) return;
             if (_MediaPlayer.Clock.IsPaused == false)
             {
                 _MediaPlayer.Clock.Controller.Pause();
@@ -112,14 +109,14 @@ namespace VKApplication.Model
             if (TotalTime - CurrentTime > TimeSpan.FromSeconds(5))
             {
                 _MediaPlayer.Clock.Controller.Seek(
-                    CurrentTime.Add(TimeSpan.FromSeconds(5)), 
+                    CurrentTime.Add(TimeSpan.FromSeconds(5)),
                     TimeSeekOrigin.BeginTime);
             }
             else
             {
                 throw new InvalidOperationException();
             }
-            
+
         }
 
         public void MoveBack()
